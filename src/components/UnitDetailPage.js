@@ -1,31 +1,53 @@
 import React, { useEffect, useState } from "react";
-import {
-  faPencilAlt,
-  faFileInvoice,
-  faWindowMaximize,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import TopBar from "./TopBar";
 
 const UnitDetailPage = (props) => {
-  const [dragPosition, setDragPosition] = useState();
+  const { data } = props.location;
 
-
-  useEffect(() => {
-      
-  });
-
-
-  const onDrag = (event) => {};
-
-
-
+  useEffect(() => {});
 
   return (
     <>
-  <div>
-    
-  </div>
-   </>
+      <TopBar />
+      <div className="unitDetail">
+        <h3>Unit Detail</h3>
+        <div className="unitDetailBox">
+          <h4>
+            Id: <span>{data.name}</span>
+          </h4>
+          <h4>
+            Name: <span>{data.name}</span>
+          </h4>
+          <h4>
+            Description: <span>{data.description}</span>
+          </h4>
+          <h4>
+            Wood Cost: <span>{data.cost.Wood}</span>
+          </h4>
+          <h4>
+            Food Cost: <span>{data.cost.Wood}</span>
+          </h4>
+          <h4>
+            Gold Cost: <span>{data.cost.Gold}</span>
+          </h4>
+          <h4>
+            Build Time: <span>{data.build_time}</span>
+          </h4>
+          <h4>
+            Reload Time: <span>{data.reload_time}</span>
+          </h4>
+          <h4>
+            Hit Points: <span>{data.hit_points}</span>
+          </h4>
+          <h4>
+            Attack: <span>{data.attack}</span>
+          </h4>
+          <h4>
+            Accuracy: <span>{data.accuracy}</span>
+          </h4>
+        </div>
+      </div>
+    </>
   );
 };
 

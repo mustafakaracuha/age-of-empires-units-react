@@ -1,37 +1,17 @@
 import React, { useEffect, useState } from "react";
-import {
-  faPencilAlt,
-  faFileInvoice,
-  faWindowMaximize,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TopBar from "./TopBar";
-import Data from "../resources/age-of-empires-units";
+import Data from "../Data/age-of-empires-units";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import Checkbox from "@material-ui/core/Checkbox";
 import Slider from "@material-ui/core/Slider";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import { Link } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 const UnitsPage = (props) => {
   const [ageUnit, setAgeUnit] = useState([]);
   const [ageUnitFilter, setAgeUnitFilter] = useState([]);
-  const costValue = [
-    {
-      Wood: Number,
-      Food: Number,
-      Gold: Number,
-    },
-  ];
   const [agesValue, setAgesValue] = useState(0);
-  const [costFilterValue, setCostValue] = useState([]);
+  const [costFilter, setCostFilter] = useState([]);
   const [woodChecked, setWoodChecked] = useState(false);
   const [woodSlider, setWoodSlider] = useState(true);
   const [foodChecked, setFoodChecked] = useState(false);
@@ -44,48 +24,50 @@ const UnitsPage = (props) => {
   });
 
   const handleChange = (event, newValue) => {
-    const ageFilterText = event.target.outerText;
-    const ageFilter = ageUnit.filter((ages) => ages.age === ageFilterText);
+    const ageFilter = ageUnit.filter(
+      (ages) => ages.age === event.target.outerText
+    );
     setAgeUnitFilter(ageFilter);
     setAgesValue(newValue);
   };
   const handleWoodChecked = (event) => {
     setWoodSlider(!woodSlider);
     setWoodChecked(event.target.checked);
-    if (woodChecked === false) {
-      const ageFilter = ageUnit.filter((ages) => ages.cost  === "Wood");
-      console.log(ageFilter)
-      setAgeUnitFilter(ageFilter);
-    }
+    const costFilter = ageUnit.filter((ages) => ages.cost && ages.cost.Wood);
+    setCostFilter(costFilter);
   };
-  const handleWoodCostValue = (value) => {
-    costValue.Wood = value;
+  const handleWoodCostValue = (event) => {
+    const costFilter = ageUnit.filter(
+      (ages) => ages.cost && ages.cost.Wood <= event.target.outerText
+    );
+    setCostFilter(costFilter);
   };
+
   const handleFoodChecked = (event) => {
     setFoodSlider(!foodSlider);
     setFoodChecked(event.target.checked);
-    if (foodChecked === false) {
-      const ageFilter = ageUnit.filter((ages) => ages.cost && ages.cost.Food   === "Food");
-      setAgeUnitFilter(ageFilter);
-    }
+    const costFilter = ageUnit.filter((ages) => ages.cost && ages.cost.Food);
+    setCostFilter(costFilter);
   };
-  const handleFoodCostValue = (value) => {
-    costValue.Food = value;
+  const handleFoodCostValue = (event) => {
+    const costFilter = ageUnit.filter(
+      (ages) => ages.cost && ages.cost.Food <= event.target.outerText
+    );
+    setCostFilter(costFilter);
   };
   const handleGoldChecked = (event) => {
     setGoldSlider(!goldSlider);
     setGoldChecked(event.target.checked);
-    if (goldChecked === false) {
-      const ageFilter = ageUnit.filter((ages) => ages.cost && ages.cost.Gold  === "Gold");
-      setAgeUnitFilter(ageFilter);
-    }
+    const costFilter = ageUnit.filter((ages) => ages.cost && ages.cost.Gold);
+    setCostFilter(costFilter);
   };
 
-  const handleGoldCostValue = (value) => {
-    costValue.Gold = value;
+  const handleGoldCostValue = (event) => {
+    const costFilter = ageUnit.filter(
+      (ages) => ages.cost && ages.cost.Gold <= event.target.outerText
+    );
+    setCostFilter(costFilter);
   };
-
-  const onDrag = (event) => {};
 
   return (
     <>
@@ -123,7 +105,7 @@ const UnitsPage = (props) => {
               aria-labelledby="discrete-slider"
               valueLabelDisplay="auto"
               step={10}
-              getAriaValueText={handleWoodCostValue}
+              onChange={handleWoodCostValue}
               marks
               disabled={woodSlider}
               min={0}
@@ -143,7 +125,7 @@ const UnitsPage = (props) => {
               aria-labelledby="discrete-slider"
               valueLabelDisplay="auto"
               step={10}
-              getAriaValueText={handleFoodCostValue}
+              onChange={handleFoodCostValue}
               marks
               disabled={foodSlider}
               min={0}
@@ -162,7 +144,7 @@ const UnitsPage = (props) => {
               defaultValue={0}
               aria-labelledby="discrete-slider"
               valueLabelDisplay="auto"
-              getAriaValueText={handleGoldCostValue}
+              onChange={handleGoldCostValue}
               step={10}
               marks
               disabled={goldSlider}
@@ -183,12 +165,17 @@ const UnitsPage = (props) => {
               <th>Costs</th>
             </tr>
 
-            {agesValue === 0 &&
+            {woodChecked === false &&
+              foodChecked === false &&
+              goldChecked === false &&
+              agesValue === 0 &&
               ageUnit.map((ages, index) => (
                 <tr>
                   <td>{ages.id}</td>
                   <td>
-                    <Link to={`/unitDetailPage`}>{ages.name}</Link>
+                    <Link to={{ pathname: `/unitDetailPage`, data: ages }}>
+                      {ages.name}
+                    </Link>
                   </td>
                   <td>{ages.age}</td>
                   {ages.cost && ages.cost.Wood && ages.cost.Food && (
@@ -206,23 +193,21 @@ const UnitsPage = (props) => {
                       {"Food: " + ages.cost.Food}, {"Gold: " + ages.cost.Gold}
                     </td>
                   )}
-                    {ages.cost && ages.cost.Gold === undefined && ages.cost.Wood === undefined && (
-                    <td>
-                      {"Food: " + ages.cost.Food}
-                    </td>
-                  )}
-                    {ages.cost && ages.cost.Wood === undefined && ages.cost.Food === undefined && (
-                    <td>
-                      {"Gold: " + ages.cost.Gold}
-                    </td>
-                  )}
-                  {ages.cost && ages.cost.Gold === undefined && ages.cost.Food === undefined && (
-                    <td>
-                      {"Wood: " + ages.cost.Wood}
-                    </td>
-                  )}
-              
-
+                  {ages.cost &&
+                    ages.cost.Gold === undefined &&
+                    ages.cost.Wood === undefined && (
+                      <td>{"Food: " + ages.cost.Food}</td>
+                    )}
+                  {ages.cost &&
+                    ages.cost.Wood === undefined &&
+                    ages.cost.Food === undefined && (
+                      <td>{"Gold: " + ages.cost.Gold}</td>
+                    )}
+                  {ages.cost &&
+                    ages.cost.Gold === undefined &&
+                    ages.cost.Food === undefined && (
+                      <td>{"Wood: " + ages.cost.Wood}</td>
+                    )}
                   {ages.cost === null && <td>No Costs</td>}
                 </tr>
               ))}
@@ -231,10 +216,56 @@ const UnitsPage = (props) => {
               <tr>
                 <td>{age.id}</td>
                 <td>
-                  <Link to={`/unitDetailPage`}>{age.name}</Link>
+                  <Link to={{ pathname: `/unitDetailPage`, data: age }}>
+                    {age.name}
+                  </Link>
                 </td>
                 <td>{age.age}</td>
                 {age.cost && age.cost.Wood && age.cost.Food && (
+                  <td>
+                    {"Wood: " + age.cost.Wood}, {"Food: " + age.cost.Food}
+                  </td>
+                )}
+                {age.cost && age.cost.Gold && age.cost.Wood && (
+                  <td>
+                    {"Gold: " + age.cost.Gold}, {"Wood: " + age.cost.Wood}
+                  </td>
+                )}
+                {age.cost && age.cost.Food && age.cost.Gold && (
+                  <td>
+                    {"Food: " + age.cost.Food}, {"Gold: " + age.cost.Gold}
+                  </td>
+                )}
+                {age.cost &&
+                  age.cost.Gold === undefined &&
+                  age.cost.Wood === undefined && (
+                    <td>{"Food: " + age.cost.Food}</td>
+                  )}
+                {age.cost &&
+                  age.cost.Wood === undefined &&
+                  age.cost.Food === undefined && (
+                    <td>{"Gold: " + age.cost.Gold}</td>
+                  )}
+                {age.cost &&
+                  age.cost.Gold === undefined &&
+                  age.cost.Food === undefined && (
+                    <td>{"Wood: " + age.cost.Wood}</td>
+                  )}
+                {age.cost === null && <td>No Costs</td>}
+              </tr>
+            ))}
+
+            {foodChecked | goldChecked | woodChecked &&
+              costFilter.map((age, index) => (
+                <tr>
+                  <td>{age.id}</td>
+                  <td>
+                    <Link to={{ pathname: `/unitDetailPage`, data: age }}>
+                      {age.name}
+                    </Link>
+                  </td>
+                  <td>{age.age}</td>
+                  {age.cost && age.cost.Wood && age.cost.Food && (
                     <td>
                       {"Wood: " + age.cost.Wood}, {"Food: " + age.cost.Food}
                     </td>
@@ -249,24 +280,24 @@ const UnitsPage = (props) => {
                       {"Food: " + age.cost.Food}, {"Gold: " + age.cost.Gold}
                     </td>
                   )}
-                   {age.cost && age.cost.Gold === undefined && age.cost.Wood === undefined && (
-                    <td>
-                      {"Food: " + age.cost.Food}
-                    </td>
-                  )}
-                    {age.cost && age.cost.Wood === undefined && age.cost.Food === undefined && (
-                    <td>
-                      {"Gold: " + age.cost.Gold}
-                    </td>
-                  )}
-                  {age.cost && age.cost.Gold === undefined && age.cost.Food === undefined && (
-                    <td>
-                      {"Wood: " + age.cost.Wood}
-                    </td>
-                  )}
-                {age.cost === null && <td>No Costs</td>}
-              </tr>
-            ))}
+                  {age.cost &&
+                    age.cost.Gold === undefined &&
+                    age.cost.Wood === undefined && (
+                      <td>{"Food: " + age.cost.Food}</td>
+                    )}
+                  {age.cost &&
+                    age.cost.Wood === undefined &&
+                    age.cost.Food === undefined && (
+                      <td>{"Gold: " + age.cost.Gold}</td>
+                    )}
+                  {age.cost &&
+                    age.cost.Gold === undefined &&
+                    age.cost.Food === undefined && (
+                      <td>{"Wood: " + age.cost.Wood}</td>
+                    )}
+                  {age.cost === null && <td>No Costs</td>}
+                </tr>
+              ))}
           </table>
         </div>
       </div>
