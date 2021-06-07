@@ -6,12 +6,15 @@ import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import Checkbox from "@material-ui/core/Checkbox";
 import Slider from "@material-ui/core/Slider";
 import { Link } from "react-router-dom";
+import { ViewAgenda } from "@material-ui/icons";
 
 const UnitsPage = (props) => {
   const [ageUnit, setAgeUnit] = useState([]);
   const [ageUnitFilter, setAgeUnitFilter] = useState([]);
   const [agesValue, setAgesValue] = useState(0);
+  const [agesText, setAgesText] = useState();
   const [costFilter, setCostFilter] = useState([]);
+  const [costAgeFilter, setCostAgeFilter] = useState([]);
   const [woodChecked, setWoodChecked] = useState(false);
   const [woodSlider, setWoodSlider] = useState(true);
   const [foodChecked, setFoodChecked] = useState(false);
@@ -27,46 +30,75 @@ const UnitsPage = (props) => {
     const ageFilter = ageUnit.filter(
       (ages) => ages.age === event.target.outerText
     );
+    setAgesText(event.target.outerText);
     setAgeUnitFilter(ageFilter);
     setAgesValue(newValue);
   };
   const handleWoodChecked = (event) => {
     setWoodSlider(!woodSlider);
     setWoodChecked(event.target.checked);
-    const costFilter = ageUnit.filter((ages) => ages.cost && ages.cost.Wood);
-    setCostFilter(costFilter);
   };
   const handleWoodCostValue = (event) => {
-    const costFilter = ageUnit.filter(
-      (ages) => ages.cost && ages.cost.Wood <= event.target.outerText
-    );
-    setCostFilter(costFilter);
+    if (agesText) {
+      const costFilter = ageUnit.filter(
+        (ages) =>
+          (ages.age === agesText) | (agesText === "All") &&
+          ages.cost &&
+          ages.cost.Wood <= event.target.outerText
+      );
+      setCostAgeFilter(costFilter);
+      console.log(costFilter);
+    } else {
+      const costFilter = ageUnit.filter(
+        (ages) => ages.cost && ages.cost.Wood <= event.target.outerText
+      );
+      setCostFilter(costFilter);
+    }
   };
 
   const handleFoodChecked = (event) => {
     setFoodSlider(!foodSlider);
     setFoodChecked(event.target.checked);
-    const costFilter = ageUnit.filter((ages) => ages.cost && ages.cost.Food);
-    setCostFilter(costFilter);
   };
   const handleFoodCostValue = (event) => {
-    const costFilter = ageUnit.filter(
-      (ages) => ages.cost && ages.cost.Food <= event.target.outerText
-    );
-    setCostFilter(costFilter);
+    if (agesText) {
+      const costFilter = ageUnit.filter(
+        (ages) =>
+          (ages.age === agesText) | (agesText === "All") &&
+          ages.cost &&
+          ages.cost.Food <= event.target.outerText
+      );
+      setCostAgeFilter(costFilter);
+      console.log(costFilter);
+    } else {
+      const costFilter = ageUnit.filter(
+        (ages) => ages.cost && ages.cost.Food <= event.target.outerText
+      );
+      setCostFilter(costFilter);
+    }
   };
+
   const handleGoldChecked = (event) => {
     setGoldSlider(!goldSlider);
     setGoldChecked(event.target.checked);
-    const costFilter = ageUnit.filter((ages) => ages.cost && ages.cost.Gold);
-    setCostFilter(costFilter);
   };
 
   const handleGoldCostValue = (event) => {
-    const costFilter = ageUnit.filter(
-      (ages) => ages.cost && ages.cost.Gold <= event.target.outerText
-    );
-    setCostFilter(costFilter);
+    if (agesText) {
+      const costFilter = ageUnit.filter(
+        (ages) =>
+          (ages.age === agesText) | (agesText === "All") &&
+          ages.cost &&
+          ages.cost.Gold <= event.target.outerText
+      );
+      setCostAgeFilter(costFilter);
+      console.log(costFilter);
+    } else {
+      const costFilter = ageUnit.filter(
+        (ages) => ages.cost && ages.cost.Gold <= event.target.outerText
+      );
+      setCostFilter(costFilter);
+    }
   };
 
   return (
@@ -212,48 +244,99 @@ const UnitsPage = (props) => {
                 </tr>
               ))}
 
-            {ageUnitFilter.map((age, index) => (
-              <tr>
-                <td>{age.id}</td>
-                <td>
-                  <Link to={{ pathname: `/unitDetailPage`, data: age }}>
-                    {age.name}
-                  </Link>
-                </td>
-                <td>{age.age}</td>
-                {age.cost && age.cost.Wood && age.cost.Food && (
+            {(agesText === undefined) | (woodChecked === false) &&
+              foodChecked === false &&
+              goldChecked === false &&
+              ageUnitFilter.map((age, index) => (
+                <tr>
+                  <td>{age.id}</td>
                   <td>
-                    {"Wood: " + age.cost.Wood}, {"Food: " + age.cost.Food}
+                    <Link to={{ pathname: `/unitDetailPage`, data: age }}>
+                      {age.name}
+                    </Link>
                   </td>
-                )}
-                {age.cost && age.cost.Gold && age.cost.Wood && (
+                  <td>{age.age}</td>
+                  {age.cost && age.cost.Wood && age.cost.Food && (
+                    <td>
+                      {"Wood: " + age.cost.Wood}, {"Food: " + age.cost.Food}
+                    </td>
+                  )}
+                  {age.cost && age.cost.Gold && age.cost.Wood && (
+                    <td>
+                      {"Gold: " + age.cost.Gold}, {"Wood: " + age.cost.Wood}
+                    </td>
+                  )}
+                  {age.cost && age.cost.Food && age.cost.Gold && (
+                    <td>
+                      {"Food: " + age.cost.Food}, {"Gold: " + age.cost.Gold}
+                    </td>
+                  )}
+                  {age.cost &&
+                    age.cost.Gold === undefined &&
+                    age.cost.Wood === undefined && (
+                      <td>{"Food: " + age.cost.Food}</td>
+                    )}
+                  {age.cost &&
+                    age.cost.Wood === undefined &&
+                    age.cost.Food === undefined && (
+                      <td>{"Gold: " + age.cost.Gold}</td>
+                    )}
+                  {age.cost &&
+                    age.cost.Gold === undefined &&
+                    age.cost.Food === undefined && (
+                      <td>{"Wood: " + age.cost.Wood}</td>
+                    )}
+                  {age.cost === null && <td>No Costs</td>}
+                </tr>
+              ))}
+
+            {agesText |
+              (agesText === "All") |
+              (woodChecked === true) |
+              (foodChecked === true) |
+              (goldChecked === true) &&
+              costAgeFilter.map((age, index) => (
+                <tr>
+                  <td>{age.id}</td>
                   <td>
-                    {"Gold: " + age.cost.Gold}, {"Wood: " + age.cost.Wood}
+                    <Link to={{ pathname: `/unitDetailPage`, data: age }}>
+                      {age.name}
+                    </Link>
                   </td>
-                )}
-                {age.cost && age.cost.Food && age.cost.Gold && (
-                  <td>
-                    {"Food: " + age.cost.Food}, {"Gold: " + age.cost.Gold}
-                  </td>
-                )}
-                {age.cost &&
-                  age.cost.Gold === undefined &&
-                  age.cost.Wood === undefined && (
-                    <td>{"Food: " + age.cost.Food}</td>
+                  <td>{age.age}</td>
+                  {age.cost && age.cost.Wood && age.cost.Food && (
+                    <td>
+                      {"Wood: " + age.cost.Wood}, {"Food: " + age.cost.Food}
+                    </td>
                   )}
-                {age.cost &&
-                  age.cost.Wood === undefined &&
-                  age.cost.Food === undefined && (
-                    <td>{"Gold: " + age.cost.Gold}</td>
+                  {age.cost && age.cost.Gold && age.cost.Wood && (
+                    <td>
+                      {"Gold: " + age.cost.Gold}, {"Wood: " + age.cost.Wood}
+                    </td>
                   )}
-                {age.cost &&
-                  age.cost.Gold === undefined &&
-                  age.cost.Food === undefined && (
-                    <td>{"Wood: " + age.cost.Wood}</td>
+                  {age.cost && age.cost.Food && age.cost.Gold && (
+                    <td>
+                      {"Food: " + age.cost.Food}, {"Gold: " + age.cost.Gold}
+                    </td>
                   )}
-                {age.cost === null && <td>No Costs</td>}
-              </tr>
-            ))}
+                  {age.cost &&
+                    age.cost.Gold === undefined &&
+                    age.cost.Wood === undefined && (
+                      <td>{"Food: " + age.cost.Food}</td>
+                    )}
+                  {age.cost &&
+                    age.cost.Wood === undefined &&
+                    age.cost.Food === undefined && (
+                      <td>{"Gold: " + age.cost.Gold}</td>
+                    )}
+                  {age.cost &&
+                    age.cost.Gold === undefined &&
+                    age.cost.Food === undefined && (
+                      <td>{"Wood: " + age.cost.Wood}</td>
+                    )}
+                  {age.cost === null && <td>No Costs</td>}
+                </tr>
+              ))}
 
             {foodChecked | goldChecked | woodChecked &&
               costFilter.map((age, index) => (

@@ -21,15 +21,33 @@ const UnitDetailPage = (props) => {
           <h4>
             Description: <span>{data.description}</span>
           </h4>
-          <h4>
-            Wood Cost: <span>{data.cost.Wood}</span>
-          </h4>
-          <h4>
-            Food Cost: <span>{data.cost.Wood}</span>
-          </h4>
-          <h4>
-            Gold Cost: <span>{data.cost.Gold}</span>
-          </h4>
+
+          {data.cost !== null ? (
+            <>
+              <h4>
+                Wood Cost: <span>{data.cost.Wood}</span>
+              </h4>
+              <h4>
+                Food Cost: <span>{data.cost.Food}</span>
+              </h4>
+              <h4>
+                Gold Cost: <span>{data.cost.Gold}</span>
+              </h4>
+            </>
+          ) : (
+            <>
+              <h4>
+                Wood Cost: <span>No Wood</span>
+              </h4>
+              <h4>
+                Food Cost: <span>No Food</span>
+              </h4>
+              <h4>
+                Gold Cost: <span>No Gold</span>
+              </h4>
+            </>
+          )}
+
           <h4>
             Build Time: <span>{data.build_time}</span>
           </h4>
